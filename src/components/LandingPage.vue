@@ -4,7 +4,6 @@
       class="main-container"
       :class="{ blurred: reportIsShown || updateAuraIsShown }"
     >
-      <TitleBar />
       <header>
         <div class="app-logo">
           <img
@@ -324,7 +323,6 @@ export default defineComponent({
     Config,
     About,
     Help,
-    TitleBar,
     Report,
     UpdatedAuraList,
     UIButton,
@@ -679,7 +677,7 @@ $iconDefaultColor: #51ae42;
 
 .main-container {
   -webkit-app-region: drag;
-  background-color: #101010;
+  // background-color: #101010;
   border-radius: 8px;
 }
 
@@ -706,11 +704,12 @@ $iconDefaultColor: #51ae42;
 }
 
 .btn.btn-menu:hover {
-  background-color: #1f1f1f;
+  // background-color: #1f1f1f;
+  border-bottom: 3px solid #c4c4c4;
 }
 
 .btn-menu.active {
-  background-color: #171717;
+  // background-color: #171717;
   border-bottom: 3px solid #c4c4c4;
 }
 

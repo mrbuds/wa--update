@@ -82,7 +82,7 @@ export default defineComponent({
 
 .btn-issue,
 .btn-refresh {
-  background-color: rgba(18, 18, 18, 0.95);
+  background-color: rgba(18, 18, 18, 0.2);
   border: 1px solid #ffffff;
   padding: 15px;
   height: 60px;

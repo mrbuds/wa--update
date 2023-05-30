@@ -66,9 +66,9 @@ async function createWindow() {
     width: 940,
     minHeight: 720,
     minWidth: 940,
-    frame: false,
+    frame: true,
+    // titleBarStyle: "hidden",
     transparent: true,
-    backgroundColor: "#00ffffff",
     icon: notificationIcon,
     resizable: true,
     webPreferences: {
@@ -105,6 +105,8 @@ async function createWindow() {
   });
 
   mainWindow?.setMenu(null);
+  mainWindow?.setBackgroundMaterial("mica");
+  mainWindow?.setVibrancy("ultra-dark");
 
   mainWindow?.on("minimize", (event) => {
     event.preventDefault();

@@ -26,7 +26,7 @@ img:not([draggable="true"]) {
   height: 100vh;
   position: relative;
   border-radius: 8px;
-  background: #131313;
+  // background: #131313;
 }
 
 .main-container {
@@ -44,10 +44,11 @@ header {
   border-radius: 8px 8px 0 0;
   height: 100px;
   font-size: 0;
-  background-color: #101010;
+  // background-color: #101010;
   transition: all 0.2s ease-in-out;
   -webkit-app-region: drag;
-  width: calc(100% - 85px);
+  // width: calc(100% - 85px);
+  width: 100%
 }
 
 .menu-btns {
@@ -60,13 +61,13 @@ main {
   flex: 1;
   overflow-y: hidden;
   -webkit-app-region: no-drag;
-  background-color: #131313;
+  // background-color: #131313;
 }
 
 footer {
   padding: 8px 2.35vw;
   text-align: left;
-  background: #101010;
+  background-color: transparent;
   border-radius: 0 0 8px 8px;
   -webkit-app-region: no-drag;
 }

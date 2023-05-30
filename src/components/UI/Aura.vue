@@ -160,8 +160,8 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .aura {
-  background-color: #101010c9;
-  border: 1px solid #101010;
+  // background-color: #101010c9;
+  // border: 1px solid #101010;
   color: rgb(255, 209, 0);
   margin: 1px;
   height: 36px;
