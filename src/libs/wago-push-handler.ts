@@ -7,6 +7,7 @@ import type { ConfigState, Version } from "@/stores/config";
 interface WagoApiResponse {
   data: string;
   status: number;
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   [Symbol.iterator](): Iterator<any>;
 }
 
