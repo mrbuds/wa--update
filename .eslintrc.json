@@ -58,7 +58,8 @@
   },
   "plugins": [
     "vue",
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "oxlint"
   ],
   "settings": {
     "import/core-modules": [
