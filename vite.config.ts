@@ -25,16 +25,10 @@ export default defineConfig(({ command }) => {
   return {
     root: __dirname,
     resolve: {
-      alias: [
-        {
-          find: /~(.+)/,
-          replacement: path.join(process.cwd(), "./node_modules/$1"),
-        },
-        {
-          find: /@\//,
-          replacement: `${path.join(process.cwd(), "./src")}/`,
-        },
-      ],
+      alias: {
+        "~": path.join(process.cwd(), "./node_modules/"),
+        "@": path.resolve(__dirname, "./src"),
+      },
     },
     define: {
       __APP_VERSION__: JSON.stringify(pkg.version),

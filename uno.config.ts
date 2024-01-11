@@ -3,6 +3,8 @@ import { defineConfig, presetIcons, presetUno } from "unocss";
 import type { IconSet } from "@iconify/tools";
 import { deOptimisePaths, importDirectory, runSVGO } from "@iconify/tools";
 import type { CustomIconLoader } from "@iconify/utils/lib/loader/types";
+import presetAnimations from "unocss-preset-animations";
+import { presetShadcn } from "unocss-preset-shadcn";
 
 /**
  * Load custom icon set
@@ -70,6 +72,15 @@ export function createConfig({ dev = true } = {}) {
     },
     shortcuts: {
       "btn-issue": "text-status-issue border-status-issue hover:bg-white",
+      "animate-accordion-up": "accordion-up",
+      "animate-accordion-down": "accordion-down",
+    },
+    content: {
+      pipeline: {
+        include: [
+          /\.(vue|svelte|[jt]s|[jt]sx|mdx?|astro|elm|php|phtml|html)($|\?)/,
+        ],
+      },
     },
     presets: [
       presetIcons({
@@ -95,6 +106,10 @@ export function createConfig({ dev = true } = {}) {
         },
       }),
       presetUno(),
+      presetAnimations(),
+      presetShadcn({
+        color: "yellow",
+      }),
     ],
     safelist: [
       "i-fa6-brands-discord",

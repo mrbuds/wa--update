@@ -3,9 +3,9 @@ import { ipcRenderer, shell } from "electron";
 import { defineComponent, ref } from "vue";
 import { useConfigStore } from "../../stores/config";
 import UIButton from "./UIButton.vue";
-import Checkbox from "./Checkbox.vue";
 import Dropdown from "./Dropdown.vue";
 import FileSelect from "./FileSelect.vue";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default defineComponent({
   components: {
@@ -114,57 +114,102 @@ export default defineComponent({
             :options="langs"
             :label="$t('app.config.lang' /* Language */)"
           />
-          <Checkbox v-model="config.notify">
-            {{
-              $t(
-                "app.config.notification" /* Show notifications for new updates */,
-              )
-            }}
-          </Checkbox>
+          <div class="items-top mb-2 flex gap-x-2">
+            <Checkbox
+              id="notify"
+              v-model="config.notify"
+            />
+            <div class="grid gap-1.5 leading-none">
+              <label
+                for="notify"
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {{
+                  $t(
+                    "app.config.notification" /* Show notifications for new updates */,
+                  )
+                }}
+              </label>
+            </div>
+          </div>
           <p
             class="label mb-2 mt-4 text-base text-brand-grey-lightest font-semibold"
           >
             {{ $t("app.config.startup" /* Startup */) }}
           </p>
-          <div class="mb-2">
-            <Checkbox v-model="config.autostart">
-              {{
-                $t(
-                  "app.config.autoStart" /* Launch client with your computer */,
-                )
-              }}
-            </Checkbox>
+          <div class="items-top mb-2 flex gap-x-2">
+            <Checkbox
+              id="autostart"
+              v-model="config.autostart"
+            />
+            <div class="grid gap-1.5 leading-none">
+              <label
+                for="autostart"
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {{
+                  $t(
+                    "app.config.autoStart" /* Launch client with your computer */,
+                  )
+                }}
+              </label>
+            </div>
           </div>
-          <div class="mb-2">
-            <Checkbox v-model="config.startminimize">
-              {{ $t("app.config.minimized" /* Start minimised */) }}
-            </Checkbox>
+          <div class="items-top mb-2 flex gap-x-2">
+            <Checkbox
+              id="start-minimized"
+              v-model="config.startminimize"
+            />
+            <div class="grid gap-1.5 leading-none">
+              <label
+                for="start-minimized"
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {{ $t("app.config.minimized" /* Start minimised */) }}
+              </label>
+            </div>
           </div>
           <p
             class="label mb-2 mt-4 text-base text-brand-grey-lightest font-semibold"
           >
             {{ $t("app.config.autoupdater" /* Updates */) }}
           </p>
-          <div class="mb-2">
-            <Checkbox v-model="config.beta">
-              {{
-                $t(
-                  "app.config.autoupdater.beta" /* Use Companion Beta channel */,
-                )
-              }}
-            </Checkbox>
+          <div class="items-top mb-2 flex gap-x-2">
+            <Checkbox
+              id="use-beta"
+              v-model="config.beta"
+            />
+            <div class="grid gap-1.5 leading-none">
+              <label
+                for="use-beta"
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {{
+                  $t(
+                    "app.config.autoupdater.beta" /* Use Companion Beta channel */,
+                  )
+                }}
+              </label>
+            </div>
           </div>
-          <!--
-          <div class="mb-2">
-            <checkbox v-model="config.autoupdate">
-              {{
-                $t(
-                  "app.config.autoupdater.autoupdate" /* Install Companion updates automatically */
-                )
-              }}
-            </checkbox>
+          <div class="items-top mb-2 flex gap-x-2">
+            <Checkbox
+              id="autoupdate"
+              v-model="config.autoupdate"
+            />
+            <div class="grid gap-1.5 leading-none">
+              <label
+                for="autoupdate"
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {{
+                  $t(
+                    "app.config.autoupdater.autoupdate" /* Install Companion updates automatically */,
+                  )
+                }}
+              </label>
+            </div>
           </div>
-          -->
         </div>
       </div>
       <div class="flex-1">
@@ -232,7 +277,7 @@ export default defineComponent({
               )
             }}
           </p>
-          <p class="mt-2">
+          <p class="mb-2 mt-2">
             <a
               href="https://wago.io/account"
               class="cursor-pointer text-xs text-brand-accent font-semibold"
@@ -241,24 +286,44 @@ export default defineComponent({
               {{ $t("app.config.getYours" /* Get yours */) }}
             </a>
           </p>
-          <Checkbox v-model="config.ignoreOwnAuras">
-            {{
-              $t(
-                "app.config.ignoreOwnAuras" /* Ignore auras from your account */,
-              )
-            }}
-          </Checkbox>
+          <div class="items-top mb-2 flex gap-x-2">
+            <Checkbox
+              id="ignore-own-auras"
+              v-model="config.ignoreOwnAuras"
+            />
+            <div class="grid gap-1.5 leading-none">
+              <label
+                for="ignore-own-auras"
+                class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                {{
+                  $t(
+                    "app.config.ignoreOwnAuras" /* Ignore auras from your account */,
+                  )
+                }}
+              </label>
+            </div>
+          </div>
         </div>
         <!-- WeakAuras Backup Section -->
         <div class="title mb-2 mt-4 text-lg">
           {{ $t("app.config.backup.title" /* WeakAuras Backup */) }}
         </div>
-        <div>
-          <p class="my-2">
-            <Checkbox v-model="config.backup.active">
+        <div class="items-top mb-2 flex gap-x-2">
+          <Checkbox
+            id="activate-backup"
+            v-model="config.backup.active"
+          />
+          <div class="grid gap-1.5 leading-none">
+            <label
+              for="activate-backup"
+              class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
               {{ $t("app.config.backup.activate" /* Activate */) }}
-            </Checkbox>
-          </p>
+            </label>
+          </div>
+        </div>
+        <div>
           <div
             v-if="config.backup.active"
             class="inline"

@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "outDir": "dist",
     "target": "ESNext",
     "esModuleInterop": true,
@@ -23,11 +26,6 @@
     "strictNullChecks": false,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
     "verbatimModuleSyntax": true,
   },
   "include": [
