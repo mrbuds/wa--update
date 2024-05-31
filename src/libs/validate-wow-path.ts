@@ -61,7 +61,7 @@ export function validateWowPath(
                   auras,
                 );
               } catch (err) {
-                console.error("No Read access");
+                console.error("No Read access", err);
               }
             }
           }

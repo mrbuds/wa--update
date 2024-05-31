@@ -27,8 +27,8 @@
     "i18n": "pnpm run compile-tools && node ./tools/scripts/extract-i18n-messages.js",
     "i18n-report": "pnpm dlx vue-i18n-extract report --add --remove --separator 'buggy' --vueFiles './src/**/*.?(ts|vue)' --languageFiles './i18n/*.json'",
     "preinstall": "npx only-allow pnpm",
-    "lint": "eslint . --cache --ext .ts,.js,.vue && prettier . --check --cache",
-    "lint:fix": "eslint . --ext .ts,.js,.vue --fix && prettier . --write",
+    "lint": "eslint . && prettier . --check --cache",
+    "lint:fix": "eslint . --fix && prettier . --write",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -54,6 +54,7 @@
     "tga": "^1.0.7"
   },
   "devDependencies": {
+    "@eslint/js": "^9.4.0",
     "@iconify-json/fa6-brands": "^1.1.19",
     "@iconify-json/mdi": "^1.1.66",
     "@iconify/tools": "^4.0.4",
@@ -63,8 +64,6 @@
     "@types/luxon": "^3.4.2",
     "@types/node": "^20.14.2",
     "@types/tail": "^2.2.3",
-    "@typescript-eslint/eslint-plugin": "^7.13.0",
-    "@typescript-eslint/parser": "^7.13.0",
     "@unocss/eslint-config": "^0.61.0",
     "@unocss/preset-icons": "^0.61.0",
     "@unocss/preset-web-fonts": "^0.61.0",
@@ -75,7 +74,7 @@
     "electron-log": "^5.1.5",
     "electron-store": "^10.0.0",
     "electron-updater": "^6.2.1",
-    "eslint": "^8.57.0",
+    "eslint": "^9.5.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vue": "^9.26.0",
     "floating-vue": "^5.2.2",
@@ -91,6 +90,7 @@
     "tail": "^2.2.6",
     "tree-kill": "^1.2.2",
     "typescript": "^5.4.5",
+    "typescript-eslint": "8.0.0-alpha.30",
     "unocss": "^0.61.0",
     "vite": "^5.3.1",
     "vite-plugin-electron": "^0.28.7",

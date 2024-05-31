@@ -23,7 +23,7 @@ function getSavedVariable(
     fs.accessSync(savedVariable, fs.constants.F_OK);
     return savedVariable;
   } catch (e) {
-    // console.log(`Error testing ${addonName} SV access\n${JSON.stringify(e)}`);
+    console.log(`Error testing ${addonName} SV access\n${JSON.stringify(e)}`);
     return false;
   }
 }

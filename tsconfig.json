@@ -31,6 +31,7 @@
   "include": [
     "./**/*.ts",
     "./**/*.vue",
+    "eslint.config.mjs",
     "uno.config.ts",
     "vite.config.ts",
     "package.json",

@@ -57,6 +57,7 @@ type UpdaterEventArg =
 interface Updater {
   status: string | null;
   progress: number | null;
+  // eslint-disable-next-line no-undef
   scheduleId: NodeJS.Timeout | null;
   version: string | null;
   path: string | null;
@@ -139,6 +140,7 @@ export default defineComponent({
         path: null,
         releaseNotes: null,
       } as Updater,
+      // eslint-disable-next-line no-undef
       isMac: process.platform === "darwin",
       accountOptions: [],
       versionOptions: [],

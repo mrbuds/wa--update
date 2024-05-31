@@ -1,6 +1,7 @@
 <script lang="ts">
 import fs from "node:fs";
 import path from "node:path";
+import { Buffer } from "node:buffer";
 import { defineComponent } from "vue";
 import { useStopMotionStore } from "../../stores/stopmotion";
 import DiscordPicker from "./DiscordPicker.vue";

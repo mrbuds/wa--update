@@ -30,6 +30,7 @@ export async function isOpen(
     await fs.promises.rename(renametest, logfile);
     return false;
   } catch (err) {
+    console.log(err);
     return true;
   }
 }

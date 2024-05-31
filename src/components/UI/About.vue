@@ -10,7 +10,9 @@ export default defineComponent({
   data() {
     return {
       medias,
+      // eslint-disable-next-line no-undef
       version: __APP_VERSION__,
+      // eslint-disable-next-line no-undef
       license: __APP_LICENSE__,
       tools: "Electron & Vue",
     };
