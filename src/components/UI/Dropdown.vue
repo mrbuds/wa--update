@@ -11,7 +11,7 @@ export default defineComponent({
       type: Array as () => Array<DropdownOption>,
       default: () => [],
     },
-    label: { type: [String, null], default: null },
+    label: { type: [String], default: null },
     placeholder: {
       type: String,
       default: "",

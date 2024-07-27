@@ -77,9 +77,9 @@ export interface AuraType {
 }
 
 export interface Version {
-  account?: string;
-  accounts?: Account[];
-  name?: string;
+  account: string;
+  accounts: Account[];
+  name: string;
 }
 
 export interface VersionOptions {
@@ -112,6 +112,7 @@ export interface ConfigState {
   wagoApiKey: string | null;
   wagoUsername: string | null;
   wowpath: WowPath;
+  selectedVersion: Version | undefined;
 }
 
 export const useConfigStore = defineStore("configStore", {
@@ -138,6 +139,17 @@ export const useConfigStore = defineStore("configStore", {
         maxSize: 100,
         defaultBackupPath: path.join(userDataPath, "WeakAurasData-Backup"),
       },
+      selectedVersion: undefined,
     };
+  },
+  actions: {
+    setSelectedVersion(version: Version) {
+      this.selectedVersion = version;
+    },
+    initializeSelectedVersion() {
+      if (this.wowpath.versions.length > 0) {
+        this.selectedVersion = this.wowpath.versions[0];
+      }
+    },
   },
 });

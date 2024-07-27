@@ -4,10 +4,10 @@
 import { ipcRenderer } from "electron";
 import fs from "node:fs";
 import path from "node:path";
-import { defineComponent, provide, ref } from "vue";
+import { defineComponent, computed, provide, ref, watch } from "vue";
 
 import { useStashStore } from "../stores/auras";
-import type { Account, AuraType, Version } from "../stores/config";
+import type { Account, Version } from "../stores/config";
 import { useConfigStore } from "../stores/config";
 
 import About from "./UI/About.vue";
@@ -41,6 +41,8 @@ import { PlaterSaved, WeakAurasSaved } from "@/libs/grab-sv-files";
 import contacts from "@/libs/contacts";
 import { compareSVwithWago } from "@/libs/compare-sv-with-wago";
 import { buildAccountList } from "@/libs/build-account-list";
+import { buildVersionList } from "@/libs/build-version-list";
+
 import type {
   ProgressInfo,
   UpdateDownloadedEvent,
@@ -77,8 +79,8 @@ interface WagoMetadata {
   displayName: string;
 }
 
-const weakauras: WeakAurasMetadata[] = contacts.weakauras;
-const wago: WagoMetadata[] = contacts.wago;
+const weakauras = ref<WeakAurasMetadata[]>(contacts.weakauras);
+const wago = ref<WagoMetadata[]>(contacts.wago);
 
 export default defineComponent({
   name: "LandingPage",
@@ -99,6 +101,22 @@ export default defineComponent({
   setup() {
     const config = useConfigStore();
     const stash = useStashStore();
+    const selectedVersion = ref<Version[]>(null);
+    const versionOptions = ref([]);
+    const accountOptions = ref([]);
+
+    const loadVersions = () => {
+      buildVersionList(config, versionOptions.value, accountOptions.value);
+    };
+
+    const loadAccounts = () => {
+      buildAccountList(config, versionOptions.value, accountOptions.value);
+    };
+
+    loadVersions();
+    loadAccounts();
+
+    config.initializeSelectedVersion();
 
     const updateAuraIsShown = ref(false);
     const toggleUpdatedAuraList = () => {
@@ -110,6 +128,109 @@ export default defineComponent({
       reportIsShown.value = !reportIsShown.value;
     };
 
+    const accountSelected = computed(() => {
+      const versionSelected = selectedVersion;
+
+      return versionSelected.value?.accounts?.find(
+        (account) => account.name === versionSelected.value.account,
+      ) as Account;
+    });
+
+    const getIsAddonInstalled = (addon: string) => {
+      return isAddonInstalled(config, addon, selectedVersion, accountSelected);
+    };
+
+    const allAddonConfigs = computed(() => {
+      const addonConfigs = [
+        {
+          addonName: "WeakAuras",
+          wagoAPI: "https://data.wago.io/api/check/",
+          addonDependency: "WeakAuras",
+          svPathFunction: WeakAurasSaved,
+          isInstalled: getIsAddonInstalled("WeakAuras"),
+          parseFunction: parseWeakAurasSVdata,
+          hasTypeColumn: false,
+        },
+        {
+          addonName: "Plater",
+          wagoAPI: "https://data.wago.io/api/check/",
+          addonDependency: "Plater",
+          svPathFunction: PlaterSaved,
+          isInstalled: getIsAddonInstalled("Plater"),
+          parseFunction: parsePlaterSVdata,
+          hasTypeColumn: true,
+        },
+      ];
+      return addonConfigs;
+    });
+
+    const addonsInstalled = computed(() => {
+      return allAddonConfigs.value.filter(
+        (addonConfig) => addonConfig.isInstalled,
+      );
+    });
+
+    const auras = computed({
+      get: () => {
+        return (
+          (config.value.wowpath.validated &&
+            config.value.wowpath.version &&
+            accountSelected.value &&
+            accountSelected.value.auras) ||
+          []
+        );
+      },
+      set: (newValue) => {
+        if (accountSelected.value) {
+          accountSelected.value.auras = newValue;
+        }
+      },
+    });
+
+    const aurasWithData = computed(() => {
+      return auras.value.filter(
+        (aura) =>
+          !!aura.encoded &&
+          !(config.ignoreOwnAuras && aura.author === config.wagoUsername),
+      );
+    });
+
+    watch(
+      () => stash.auras,
+      () => {
+        writeAddonData(config, addonsInstalled, aurasWithData, stash);
+      },
+      { deep: true },
+    );
+
+    watch(
+      () => config.wowpath.value,
+      () => {
+        validateWowPath(
+          config,
+          versionOptions,
+          accountOptions,
+          selectedVersion,
+          auras,
+        );
+      },
+    );
+
+    watch(
+      () => config.wowpath.version,
+      (newVersion) => {
+        const version = config.wowpath.versions?.find(
+          (version) => version.name === newVersion,
+        );
+        if (version) {
+          console.log(version);
+          selectedVersion.value = version;
+        }
+
+        buildAccountList(config, accountOptions, selectedVersion, auras);
+      },
+    );
+
     provide("toggleReport", toggleReport);
     provide("toggleUpdatedAuraList", toggleUpdatedAuraList);
 
@@ -120,6 +241,7 @@ export default defineComponent({
       reportIsShown,
       toggleUpdatedAuraList,
       toggleReport,
+      selectedVersion,
     };
   },
   data() {
@@ -152,39 +274,11 @@ export default defineComponent({
       return this.stash.tohtml();
     },
     accountHash() {
-      if (this.versionSelected) {
-        const { account } = this.versionSelected;
+      if (this.selectedVersion) {
+        const { account } = this.selectedVersion;
         return hash.hashFnv32a(account, true);
       }
       return null;
-    },
-    allAddonConfigs() {
-      const addonConfigs = [
-        {
-          addonName: "WeakAuras",
-          wagoAPI: "https://data.wago.io/api/check/",
-          addonDependency: "WeakAuras",
-          svPathFunction: WeakAurasSaved,
-          isInstalled: this.getIsAddonInstalled("WeakAuras"),
-          parseFunction: parseWeakAurasSVdata,
-          hasTypeColumn: false,
-        },
-        {
-          addonName: "Plater",
-          wagoAPI: "https://data.wago.io/api/check/",
-          addonDependency: "Plater",
-          svPathFunction: PlaterSaved,
-          isInstalled: this.getIsAddonInstalled("Plater"),
-          parseFunction: parsePlaterSVdata,
-          hasTypeColumn: true,
-        },
-      ];
-      return addonConfigs;
-    },
-    addonsInstalled() {
-      return this.allAddonConfigs.filter(
-        (addonConfig) => addonConfig.isInstalled,
-      );
     },
     addonSelectedConfig() {
       if (!this.addonSelected) return null;
@@ -192,37 +286,6 @@ export default defineComponent({
         (addonConfig) =>
           addonConfig.addonName.toLowerCase() ===
           this.addonSelected.toLowerCase(),
-      );
-    },
-    versionSelected(): Version | undefined {
-      if (!this.config.wowpath.version || !this.config.wowpath.versions) {
-        return undefined;
-      }
-
-      const selectedVersion = this.config.wowpath.versions.find(
-        (version) => version.name === this.config.wowpath.version,
-      );
-
-      return selectedVersion || undefined;
-    },
-    accountSelected(): Account {
-      const versionSelected = this.versionSelected;
-
-      if (typeof versionSelected === "object") {
-        return versionSelected.accounts.find(
-          (account) => account.name === versionSelected.account,
-        );
-      }
-      return null;
-    },
-    aurasWithData() {
-      return this.auras.filter(
-        (aura) =>
-          !!aura.encoded &&
-          !(
-            this.config.ignoreOwnAuras &&
-            aura.author === this.config.wagoUsername
-          ),
       );
     },
     aurasWithUpdate() {
@@ -260,50 +323,6 @@ export default defineComponent({
 
       return createSortByString(dir, this.sortedColumn);
     },
-    auras: {
-      get(): AuraType[] {
-        return (
-          (this.config.wowpath.validated &&
-            this.config.wowpath.version &&
-            this.accountSelected &&
-            this.accountSelected.auras) ||
-          []
-        );
-      },
-      set(newValue: AuraType[]) {
-        this.accountSelected.auras = newValue;
-      },
-    },
-  },
-  watch: {
-    "stash.auras": {
-      handler() {
-        writeAddonData(
-          this.config,
-          this.addonsInstalled,
-          this.aurasWithData,
-          this.stash,
-        );
-      },
-      deep: true,
-    },
-    "config.wowpath.value": function () {
-      validateWowPath(
-        this.config,
-        this.versionOptions,
-        this.accountOptions,
-        this.versionSelected,
-        this.auras,
-      );
-    },
-    "config.wowpath.version": function () {
-      buildAccountList(
-        this.config,
-        this.accountOptions,
-        this.versionSelected,
-        this.auras,
-      );
-    },
   },
   async mounted() {
     ipcRenderer.on("setAllowPrerelease", (_event, allowPrerelease: boolean) => {
@@ -320,19 +339,21 @@ export default defineComponent({
 
       if (link) {
         const result = link.match(pattern);
-        let slug: string;
+        let slug: string = "";
 
         if (result) {
           ({ 1: slug } = result);
         }
 
         if (slug) {
-          await wagoPushHandler(
-            this.config,
-            slug,
-            this.stash,
-            this.versionSelected,
-          );
+          if (this.selectedVersion) {
+            await wagoPushHandler(
+              this.config,
+              slug,
+              this.stash,
+              this.selectedVersion,
+            );
+          }
         }
       }
     });
@@ -397,7 +418,7 @@ export default defineComponent({
             this.config,
             this.versionOptions,
             this.accountOptions,
-            this.versionSelected,
+            this.selectedVersion,
             this.auras,
           );
         }
@@ -405,6 +426,12 @@ export default defineComponent({
         console.log(JSON.stringify(e));
       }
     }
+
+    // if (this.config.wowpath.validated) {
+    //   this.selectedVersion = this.config.wowpath.versions.find(
+    //     (version) => version.name === this.config.wowpath.version,
+    //   );
+    // }
 
     // create default backup folder
     fs.mkdir(path.join(userDataPath, "WeakAurasData-Backup"), () => {
@@ -460,22 +487,14 @@ export default defineComponent({
     getWeakAurasSaved() {
       return WeakAurasSaved(
         this.config,
-        this.versionSelected,
+        this.selectedVersion,
         this.accountSelected,
       );
     },
     getPlaterSaved() {
       return PlaterSaved(
         this.config,
-        this.versionSelected,
-        this.accountSelected,
-      );
-    },
-    getIsAddonInstalled(addon: string) {
-      return isAddonInstalled(
-        this.config,
-        addon,
-        this.versionSelected,
+        this.selectedVersion,
         this.accountSelected,
       );
     },
@@ -503,7 +522,7 @@ export default defineComponent({
     async doCompareSVwithWago() {
       return compareSVwithWago(
         this.config,
-        this.versionSelected,
+        this.selectedVersion,
         this.accountSelected,
         this.fetching,
         this.addonsInstalled,
@@ -609,11 +628,11 @@ export default defineComponent({
               />
             </div>
             <div
-              v-if="config.wowpath.validated && versionSelected"
+              v-if="config.wowpath.validated && selectedVersion"
               id="account-selector"
             >
               <Dropdown
-                v-model:value="versionSelected.account"
+                v-model:value="selectedVersion.account"
                 :options="accountOptions"
                 :label="$t('app.wowpath.account' /* Account */)"
                 @change="doCompareSVwithWago()"
@@ -645,7 +664,7 @@ export default defineComponent({
           <div id="dashboard">
             <RefreshButton
               :is-settings-ok="config.wowpath.validated"
-              :is-version-selected="versionSelected"
+              :is-version-selected="selectedVersion"
               :is-account-selected="accountSelected"
               :is-sv-ok="!!getWeakAurasSaved() || !!getPlaterSaved()"
               :fetching="fetching"
@@ -748,7 +767,7 @@ export default defineComponent({
         <div class="app-update">
           <a
             v-if="updater.status === 'update-available'"
-            :href="updater.path"
+            :href="updater.path || ''"
             target="_blank"
           >
             <i
