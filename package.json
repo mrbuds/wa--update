@@ -91,7 +91,7 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "8.22.0",
     "unocss": "^65.4.3",
-    "vite": "^5.4.12",
+    "vite": "^6.0.11",
     "vite-plugin-electron": "^0.29.0",
     "vite-plugin-electron-renderer": "^0.14.6",
     "vite-plugin-resolve": "^2.5.2",
